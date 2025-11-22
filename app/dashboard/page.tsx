@@ -12,8 +12,12 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CirclePlus } from "lucide-react";
 import Link from "next/link";
+import { db } from "@/db";
+import { Invoices } from "@/db/schema";
 
-export default function Home() {
+export default async function Home() {
+  const results = await db.select().from(Invoices);
+
   return (
     <div className="flex flex-col justify-center h-full text-center mx-auto max-w-5xl">
       <div className="flex justify-between my-12">
@@ -39,25 +43,37 @@ export default function Home() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          <TableRow>
-            <TableCell className="font-medium text-left p-4">
-              <span>INV001</span>
-            </TableCell>
-            <TableCell className="text-left p-4">
-              <span>Paid</span>
-            </TableCell>
-            <TableCell className="text-left p-4">
-              <span> Paid</span>
-            </TableCell>
-            <TableCell className="text-center p-4">
-              <Badge>
-                <span>Open</span>
-              </Badge>
-            </TableCell>
-            <TableCell className="text-right p-4">
-              <span>$250.00</span>
-            </TableCell>
-          </TableRow>
+          {results.map((result) => {
+            return (
+              <TableRow key={result.id}>
+                <TableCell className="font-medium text-left p-0">
+                  <Link href={`/invoices/${result.id}`} className="p-4 block">
+                    {new Date(result.createTs).toLocaleDateString()}
+                  </Link>
+                </TableCell>
+                <TableCell className="text-left p-0">
+                  <Link className="p-4 block" href={`/invoices/${result.id}`}>
+                    {result.name}
+                  </Link>
+                </TableCell>
+                <TableCell className="text-left p-0">
+                  <Link className="p-4 block" href={`/invoices/${result.id}`}>
+                    {result.email}
+                  </Link>
+                </TableCell>
+                <TableCell className="text-center p-0">
+                  <Link className="p-4 block" href={`/invoices/${result.id}`}>
+                    <Badge>{result.status}</Badge>
+                  </Link>
+                </TableCell>
+                <TableCell className="text-right p-0">
+                  <Link className="p-4 block" href={`/invoices/${result.id}`}>
+                    ${(result.value / 100).toFixed(2)}
+                  </Link>
+                </TableCell>
+              </TableRow>
+            );
+          })}
         </TableBody>
       </Table>
     </div>

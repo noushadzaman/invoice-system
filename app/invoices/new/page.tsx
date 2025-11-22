@@ -1,20 +1,45 @@
-import { Button } from "@/components/ui/button";
+"use client";
+
+import { createAction } from "@/app/actions";
+import SubmitButton from "@/components/SubmitButton";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { db } from "@/db";
-import { sql } from "drizzle-orm";
+import { startTransition, SyntheticEvent, useState } from "react";
+import Form from "next/form";
 
-export default async function Home() {
-  const result = await db.execute(sql`SELECT current_database()`);
+export default function Home() {
+  const [state, setState] = useState("ready");
+
+  const handleonSubmit = async (e: SyntheticEvent) => {
+    if (state === "pending") {
+      e.preventDefault();
+      return;
+    }
+    setState("pending");
+    // e.preventDefault();
+    // if (state === "pending") {
+    //   return;
+    // }
+    // setState("pending");
+    // const target = e.target as HTMLFormElement;
+
+    // startTransition(async () => {
+    //   const formData = new FormData(target);
+    //   await createAction(formData);
+    // });
+  };
+
   return (
     <div className="flex flex-col justify-center h-full  mx-auto max-w-5xl">
       <div className="flex justify-between my-12">
         <h1 className="text-3xl font-semibold">Create invoice</h1>
       </div>
-      {JSON.stringify(result)}
-
-      <form className="grid gap-4">
+      <Form
+        action={createAction}
+        onSubmit={handleonSubmit}
+        className="grid gap-4"
+      >
         <div>
           <Label htmlFor="name" className="block mb-2 font-semibold text-sm">
             Billing Name
@@ -43,9 +68,9 @@ export default async function Home() {
           <Textarea name="description" id="description" />
         </div>
         <div>
-          <Button className="w-full font-semibold">Submit</Button>
+          <SubmitButton />
         </div>
-      </form>
+      </Form>
     </div>
   );
 }

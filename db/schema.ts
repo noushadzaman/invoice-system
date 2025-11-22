@@ -20,4 +20,6 @@ export const Invoices = pgTable("invoices", {
   status: statusEnum("status").notNull(),
   value: integer("value").notNull(),
   description: text("descriptiopn").notNull(),
+  name: text("text").notNull(),
+  email: text("email").notNull(),
 });
