@@ -16,9 +16,18 @@ import { db } from "@/db";
 import { Invoices } from "@/db/schema";
 import Container from "@/components/Container";
 import { cn } from "@/lib/utils";
+import { auth } from "@clerk/nextjs/server";
+import { eq } from "drizzle-orm";
 
 export default async function Home() {
-  const invoices = await db.select().from(Invoices);
+  const { userId } = await auth();
+
+  if (!userId) return;
+
+  const invoices = await db
+    .select()
+    .from(Invoices)
+    .where(eq(Invoices.userId, userId));
 
   return (
     <main className="h-full">
